@@ -6,7 +6,7 @@ use serde::{
 	de::{self, MapAccess, Visitor},
 	Deserialize, Deserializer,
 };
-use std::{cmp::min, fmt, str::Chars};
+use std::fmt;
 
 pub enum Provider {
 	HiAnime,
@@ -14,7 +14,7 @@ pub enum Provider {
 	AnimePahe,
 }
 
-pub async fn search(provider: Provider, query: &str) -> Result<SearchResults, anyhow::Error> {
+pub async fn search(provider: Provider, query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
 	match provider {
 		Provider::HiAnime => hianime::ajax::search(query).await,
 		Provider::AnimeKai => animekai::ajax::search(query).await,
@@ -22,17 +22,21 @@ pub async fn search(provider: Provider, query: &str) -> Result<SearchResults, an
 	}
 }
 
-#[derive(Debug)]
-pub struct SearchResults {
-	pub closest_match: SearchResult,
-	pub results: Vec<SearchResult>,
-}
-
 #[derive(Clone, Debug)]
 pub struct SearchResult {
 	pub title: String,
 	pub poster: String,
 	pub id: String,
+}
+
+impl SearchResult {
+	pub async fn episodes(&self, provider: Provider) -> Result<Vec<Episode>, anyhow::Error> {
+		match provider {
+			Provider::HiAnime => hianime::ajax::episodes(&self.id).await,
+			Provider::AnimeKai => animekai::ajax::episodes(&self.id).await,
+			Provider::AnimePahe => animepahe::api::episodes(&self.id).await,
+		}
+	}
 }
 
 impl<'de> Deserialize<'de> for SearchResult {
@@ -92,11 +96,31 @@ pub struct Episode {
 	pub id: String,
 }
 
+impl Episode {
+	pub async fn servers(&self, provider: Provider) -> Result<Vec<Server>, anyhow::Error> {
+		match provider {
+			Provider::HiAnime => hianime::ajax::servers(&self.id).await,
+			Provider::AnimeKai => animekai::ajax::servers(&self.id).await,
+			Provider::AnimePahe => animepahe::api::servers(&self.id).await,
+		}
+	}
+}
+
 #[derive(Debug, PartialEq)]
 pub struct Server {
 	pub name: String,
 	pub locale: Locale,
 	pub url: String,
+}
+
+impl Server {
+	pub async fn get_source(&self, provider: Provider) -> Result<Source, anyhow::Error> {
+		match provider {
+			Provider::HiAnime => hianime::ajax::get_source(&self.url).await,
+			Provider::AnimeKai => animekai::ajax::get_source(&self.url).await,
+			Provider::AnimePahe => animepahe::api::get_source(&self.url).await,
+		}
+	}
 }
 
 #[derive(Debug, Default, PartialEq)]
@@ -129,66 +153,4 @@ pub struct Caption {
 	pub url: String,
 	pub label: Option<String>,
 	pub kind: String,
-}
-
-// https://github.com/rapidfuzz/strsim-rs/blob/main/src/lib.rs#L166
-struct StringWrapper<'a>(&'a str);
-
-impl<'b> IntoIterator for &StringWrapper<'b> {
-	type Item = char;
-	type IntoIter = Chars<'b>;
-
-	fn into_iter(self) -> Self::IntoIter {
-		self.0.chars()
-	}
-}
-
-/// https://github.com/rapidfuzz/strsim-rs/blob/main/src/lib.rs#L233
-fn generic_levenshtein<'a, 'b, Iter1, Iter2, Elem1, Elem2>(a: &'a Iter1, b: &'b Iter2) -> usize
-where
-	&'a Iter1: IntoIterator<Item = Elem1>,
-	&'b Iter2: IntoIterator<Item = Elem2>,
-	Elem1: PartialEq<Elem2>,
-{
-	let b_len = b.into_iter().count();
-
-	let mut cache: Vec<usize> = (1..b_len + 1).collect();
-
-	let mut result = b_len;
-
-	for (i, a_elem) in a.into_iter().enumerate() {
-		result = i + 1;
-		let mut distance_b = i;
-
-		for (j, b_elem) in b.into_iter().enumerate() {
-			let cost = usize::from(a_elem != b_elem);
-			let distance_a = distance_b + cost;
-			distance_b = cache[j];
-			result = min(result + 1, min(distance_a, distance_b + 1));
-			cache[j] = result;
-		}
-	}
-
-	result
-}
-
-/// https://github.com/rapidfuzz/strsim-rs/blob/main/src/lib.rs#L269
-fn levenshtein(a: &str, b: &str) -> usize {
-	generic_levenshtein(&StringWrapper(a), &StringWrapper(b))
-}
-
-/// https://github.com/rapidfuzz/strsim-rs/blob/main/src/lib.rs#L285
-fn normalized_levenshtein(a: &str, b: &str) -> f64 {
-	if a.is_empty() && b.is_empty() {
-		return 1.0;
-	}
-	1.0 - (levenshtein(a, b) as f64) / (a.chars().count().max(b.chars().count()) as f64)
-}
-
-pub fn get_closest_match<'a>(query: &str, results: &'a [SearchResult]) -> Option<&'a SearchResult> {
-	results.iter().max_by(|a, b| {
-		normalized_levenshtein(query, &a.title)
-			.partial_cmp(&normalized_levenshtein(query, &b.title))
-			.unwrap()
-	})
 }

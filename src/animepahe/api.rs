@@ -1,6 +1,6 @@
 use std::sync::LazyLock;
 
-use crate::{animepahe::unpacker, Episode, Locale, SearchResult, SearchResults, Server, Source};
+use crate::{animepahe::unpacker, Episode, Locale, SearchResult, Server, Source};
 use anyhow::Context as _;
 use futures::{stream, StreamExt as _};
 use kuchikiki::traits::*;
@@ -40,7 +40,7 @@ async fn create_client() -> Result<Client, anyhow::Error> {
 	Ok(client)
 }
 
-static CLIENT: LazyLock<OnceCell<Client>> = LazyLock::new(|| OnceCell::new());
+static CLIENT: LazyLock<OnceCell<Client>> = LazyLock::new(OnceCell::new);
 
 async fn get_client() -> Result<&'static Client, anyhow::Error> {
 	Ok(CLIENT
@@ -48,7 +48,7 @@ async fn get_client() -> Result<&'static Client, anyhow::Error> {
 		.await)
 }
 
-pub async fn search(query: &str) -> Result<SearchResults, anyhow::Error> {
+pub async fn search(query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
 	let client = get_client().await?;
 	let json: Value = client
 		.get(format!("https://animepahe.ru/api?m=search&q={query}"))
@@ -58,11 +58,7 @@ pub async fn search(query: &str) -> Result<SearchResults, anyhow::Error> {
 		.await?;
 
 	let data: Vec<SearchResult> = serde_json::from_value(json["data"].clone())?;
-	let closest_match = crate::get_closest_match(query, &data).context("No results")?;
-	Ok(SearchResults {
-		closest_match: closest_match.clone(),
-		results: data,
-	})
+	Ok(data)
 }
 
 pub async fn episodes(id: &str) -> Result<Vec<Episode>, anyhow::Error> {
@@ -215,8 +211,8 @@ mod tests {
 	#[tokio::test]
 	async fn test_search() {
 		let results = search("One Piece").await.unwrap();
-		assert_eq!(results.closest_match.id, "4");
-		assert!(!results.results.is_empty(), "Results should not be empty");
+		assert_eq!(results[0].id, "4");
+		assert!(!results.is_empty(), "Results should not be empty");
 	}
 
 	#[tokio::test]

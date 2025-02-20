@@ -1,9 +1,9 @@
-use crate::{Episode, Locale, SearchResult, SearchResults, Server, Source, Caption};
+use crate::{Episode, Locale, SearchResult, Server, Source, Caption};
 use anyhow::Context as _;
 use kuchikiki::traits::*;
 use serde_json::Value;
 
-pub async fn search(query: &str) -> Result<SearchResults, anyhow::Error> {
+pub async fn search(query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
 	let html = reqwest::get(format!("https://hianime.to/search?keyword={query}"))
 		.await?
 		.text()
@@ -34,11 +34,7 @@ pub async fn search(query: &str) -> Result<SearchResults, anyhow::Error> {
 		})
 		.collect();
 
-	let closest_match = crate::get_closest_match(query, &results).context("No results")?;
-	Ok(SearchResults {
-		closest_match: closest_match.clone(),
-		results,
-	})
+	Ok(results)
 }
 
 pub async fn episodes(id: &str) -> Result<Vec<Episode>, anyhow::Error> {
@@ -112,8 +108,6 @@ pub async fn servers(ep_id: &str) -> Result<Vec<Server>, anyhow::Error> {
 }
 
 pub async fn get_source(url: &str) -> Result<Source, anyhow::Error> {
-	// https://megacloud.tv/embed-2/e-1/dRyYABDmHnyQ?k=1
-	// xrax = dRyYABDmHnyQ
 	let xrax = url.rsplit_once('/').unwrap().1.split('?').next().unwrap();
 	let (json, secret) = cryptography::sources::megacloud::get_sources(xrax.to_string()).await?;
 
@@ -136,8 +130,8 @@ mod tests {
 	#[tokio::test]
 	async fn test_search() {
 		let results = search("One Piece").await.unwrap();
-		assert_eq!(results.closest_match.id, "100");
-		assert!(!results.results.is_empty(), "Results should not be empty");
+		assert_eq!(results[1].id, "100");
+		assert!(!results.is_empty(), "Results should not be empty");
 	}
 
 	#[tokio::test]

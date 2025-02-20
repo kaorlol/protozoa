@@ -8,7 +8,6 @@ use cbc::{
 use regex::Regex;
 use reqwest::{header, ClientBuilder};
 use rustyscript::{json_args, Module, ModuleWrapper};
-use serde_json::Value;
 use std::path::PathBuf;
 
 async fn get_wasm() -> Result<Vec<u8>, anyhow::Error> {
@@ -95,21 +94,6 @@ async fn rabbit(xrax: &str) -> Result<Rabbit, anyhow::Error> {
 	result.await?
 }
 
-// #[derive(Debug)]
-// pub struct Megacloud {
-// 	pub url: String,
-// 	#[serde(rename = "tracks")]
-// 	pub captions: Vec<Track>,
-// }
-
-// #[derive(Debug)]
-// pub struct Track {
-// 	#[serde(rename = "file")]
-// 	pub url: String,
-// 	pub label: Option<String>,
-// 	pub kind: String,
-// }
-
 pub async fn get_sources(xrax: String) -> Result<(String, String), anyhow::Error> {
 	let rab = rabbit(&xrax).await?;
 
@@ -142,27 +126,6 @@ pub async fn get_sources(xrax: String) -> Result<(String, String), anyhow::Error
 
 	let text = client.get(&url).send().await?.text().await?;
 	Ok((text, rab.secret))
-
-	// let json = client
-	// 	.get(url)
-	// 	.send()
-	// 	.await?
-	// 	.json::<serde_json::Value>()
-	// 	.await?;
-
-	// let cipher_text = json["sources"]
-	// 	.as_str()
-	// 	.context("Failed to get cipher text")?;
-
-	// let decrypted = decrypt(cipher_text, &rab.secret)?;
-	// let decrypted_source = serde_json::from_str::<Vec<Value>>(&decrypted)?;
-	// let url = decrypted_source[0]["file"]
-	// 	.as_str()
-	// 	.context("Failed to get url")?
-	// 	.to_string();
-
-	// let captions: Vec<Track> = serde_json::from_value(json["tracks"].clone())?;
-	// Ok(Megacloud { url, captions })
 }
 
 fn generate_encryption_key(salt: &[u8], secret_bytes: &[u8]) -> Vec<u8> {

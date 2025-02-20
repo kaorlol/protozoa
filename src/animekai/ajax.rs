@@ -1,9 +1,9 @@
-use crate::{Caption, Episode, Locale, SearchResult, SearchResults, Server, Source};
+use crate::{Caption, Episode, Locale, SearchResult, Server, Source};
 use anyhow::Context as _;
 use kuchikiki::traits::*;
 use serde_json::Value;
 
-pub async fn search(query: &str) -> Result<SearchResults, anyhow::Error> {
+pub async fn search(query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
 	let json: Value = reqwest::get(format!(
 		"https://animekai.to/ajax/anime/search?keyword={query}"
 	))
@@ -39,11 +39,7 @@ pub async fn search(query: &str) -> Result<SearchResults, anyhow::Error> {
 		})
 		.collect();
 
-	let closest_match = crate::get_closest_match(query, &results).context("No results")?;
-	Ok(SearchResults {
-		closest_match: closest_match.clone(),
-		results,
-	})
+	Ok(results)
 }
 
 pub async fn episodes(id: &str) -> Result<Vec<Episode>, anyhow::Error> {
@@ -168,8 +164,8 @@ mod tests {
 	#[tokio::test]
 	async fn test_search() {
 		let results = search("One Piece").await.unwrap();
-		assert_eq!(results.closest_match.id, "dk6r");
-		assert!(!results.results.is_empty(), "Results should not be empty");
+		assert_eq!(results[0].id, "dk6r");
+		assert!(!results.is_empty(), "Results should not be empty");
 	}
 
 	#[tokio::test]
@@ -190,7 +186,6 @@ mod tests {
 		assert!(!servers.is_empty(), "Can't test source without servers");
 
 		let source = get_source(&servers[0].url).await.unwrap();
-
 		assert!(!source.url.is_empty(), "Source url should not be empty");
 	}
 }
