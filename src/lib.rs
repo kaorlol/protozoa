@@ -24,7 +24,7 @@ impl fmt::Display for Provider {
 	}
 }
 
-pub async fn search(provider: Provider, query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
+pub async fn search(provider: &Provider, query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
 	match provider {
 		Provider::HiAnime => hianime::ajax::search(query).await,
 		Provider::AnimeKai => animekai::ajax::search(query).await,
@@ -46,7 +46,7 @@ impl fmt::Display for SearchResult {
 }
 
 impl SearchResult {
-	pub async fn episodes(&self, provider: Provider) -> Result<Vec<Episode>, anyhow::Error> {
+	pub async fn episodes(&self, provider: &Provider) -> Result<Vec<Episode>, anyhow::Error> {
 		match provider {
 			Provider::HiAnime => hianime::ajax::episodes(&self.id).await,
 			Provider::AnimeKai => animekai::ajax::episodes(&self.id).await,
@@ -119,7 +119,7 @@ impl fmt::Display for Episode {
 }
 
 impl Episode {
-	pub async fn servers(&self, provider: Provider) -> Result<Vec<Server>, anyhow::Error> {
+	pub async fn servers(&self, provider: &Provider) -> Result<Vec<Server>, anyhow::Error> {
 		match provider {
 			Provider::HiAnime => hianime::ajax::servers(&self.id).await,
 			Provider::AnimeKai => animekai::ajax::servers(&self.id).await,
@@ -142,7 +142,7 @@ impl fmt::Display for Server {
 }
 
 impl Server {
-	pub async fn get_source(&self, provider: Provider) -> Result<Source, anyhow::Error> {
+	pub async fn get_source(&self, provider: &Provider) -> Result<Source, anyhow::Error> {
 		match provider {
 			Provider::HiAnime => hianime::ajax::get_source(&self.url).await,
 			Provider::AnimeKai => animekai::ajax::get_source(&self.url).await,
