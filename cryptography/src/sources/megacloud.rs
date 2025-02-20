@@ -70,11 +70,16 @@ async fn rabbit(xrax: &str) -> Result<Rabbit, anyhow::Error> {
 	let meta = get_meta(xrax).await?;
 	let wasm = get_wasm().await?;
 
+	let script = reqwest::get(
+		"https://raw.githubusercontent.com/kaorlol/protozoa/refs/heads/main/cryptography/rabbit.js",
+	)
+	.await?
+	.bytes()
+	.await?
+	.to_vec();
+
 	let xrax = xrax.to_string();
 	let result = tokio::task::spawn_blocking(move || -> Result<Rabbit, anyhow::Error> {
-		let project_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-		let script =
-			std::fs::read(format!("{}/rabbit.js", project_root.to_str().unwrap())).unwrap();
 		let module = Module::new("rabbit.js", String::from_utf8_lossy(&script));
 
 		let mut module_wrapper = ModuleWrapper::new_from_module(&module, Default::default())?;
