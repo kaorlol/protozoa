@@ -182,3 +182,9 @@ pub struct Caption {
 	pub label: Option<String>,
 	pub kind: String,
 }
+
+impl fmt::Display for Caption {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "{}", self.label.as_ref().unwrap())
+	}
+}
