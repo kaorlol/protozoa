@@ -2,15 +2,14 @@
 name = "protozoa"
 version = "0.1.0"
 edition = "2021"
+repository = "https://github.com/kaorlol/protozoa"
 include = [
 	"**/*.rs",
 	"Cargo.toml",
 ]
 
-[dependencies.cryptography]
-path = "./cryptography"
-
 [dependencies]
+protozoa-cryptography ={ path = "./protozoa-cryptography" }
 anyhow = "1.0.96"
 futures = "0.3.31"
 lazy_static = "1.5.0"

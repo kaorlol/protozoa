@@ -456,23 +456,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cryptography"
-version = "0.1.0"
-dependencies = [
- "aes",
- "anyhow",
- "base64 0.22.1",
- "cbc",
- "md5",
- "regex",
- "reqwest",
- "rustyscript",
- "serde_json",
- "tokio",
- "urlencoding",
-]
-
-[[package]]
 name = "cssparser"
 version = "0.28.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2404,15 +2387,32 @@ name = "protozoa"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "cryptography",
  "futures",
  "kuchikiki",
  "lazy_static",
+ "protozoa-cryptography",
  "regex",
  "reqwest",
  "serde",
  "serde_json",
  "tokio",
+]
+
+[[package]]
+name = "protozoa-cryptography"
+version = "0.1.0"
+dependencies = [
+ "aes",
+ "anyhow",
+ "base64 0.22.1",
+ "cbc",
+ "md5",
+ "regex",
+ "reqwest",
+ "rustyscript",
+ "serde_json",
+ "tokio",
+ "urlencoding",
 ]
 
 [[package]]
