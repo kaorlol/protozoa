@@ -8,7 +8,6 @@ use cbc::{
 use regex::Regex;
 use reqwest::{header, ClientBuilder};
 use rustyscript::{json_args, Module, ModuleWrapper};
-use std::path::PathBuf;
 
 async fn get_wasm() -> Result<Vec<u8>, anyhow::Error> {
 	let client = ClientBuilder::new()
