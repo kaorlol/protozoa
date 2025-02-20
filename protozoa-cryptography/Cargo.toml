@@ -2,6 +2,7 @@
 name = "protozoa-cryptography"
 version = "0.1.0"
 edition = "2021"
+repository = "https://github.com/kaorlol/protozoa/tree/main/protozoa-cryptography"
 include = [
 	"**/*.rs",
 	"Cargo.toml",

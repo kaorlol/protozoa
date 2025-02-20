@@ -107,9 +107,9 @@ checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
 name = "anyhow"
-version = "1.0.95"
+version = "1.0.96"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34ac096ce696dc2fcabef30516bb13c0a68a11d30131d3df6f04711467681b04"
+checksum = "6b964d184e89d9b6b67dd2715bc8e74cf3107fb2b529990c90cf517326150bf4"
 
 [[package]]
 name = "ast_node"
@@ -441,23 +441,6 @@ dependencies = [
  "generic-array",
  "rand_core",
  "typenum",
-]
-
-[[package]]
-name = "cryptography"
-version = "0.1.0"
-dependencies = [
- "aes",
- "anyhow",
- "base64 0.22.1",
- "cbc",
- "md5",
- "regex",
- "reqwest",
- "rustyscript",
- "serde_json",
- "tokio",
- "urlencoding",
 ]
 
 [[package]]
@@ -2173,6 +2156,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "protozoa-cryptography"
+version = "0.1.0"
+dependencies = [
+ "aes",
+ "anyhow",
+ "base64 0.22.1",
+ "cbc",
+ "md5",
+ "regex",
+ "reqwest",
+ "rustyscript",
+ "serde_json",
+ "tokio",
+ "urlencoding",
+]
+
+[[package]]
 name = "psm"
 version = "0.1.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2606,9 +2606,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.138"
+version = "1.0.139"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d434192e7da787e94a6ea7e9670b26a036d0ca41e0b7efb2676dd32bae872949"
+checksum = "44f86c3acccc9c65b153fe1b85a3be07fe5515274ec9f0653b4a0875731c72a6"
 dependencies = [
  "indexmap",
  "itoa",
