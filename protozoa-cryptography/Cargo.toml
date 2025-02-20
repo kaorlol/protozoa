@@ -3,6 +3,8 @@ name = "protozoa-cryptography"
 version = "0.1.0"
 edition = "2021"
 repository = "https://github.com/kaorlol/protozoa/tree/main/protozoa-cryptography"
+description = "Cryptography library for Protozoa"
+license = "MIT"
 include = [
 	"**/*.rs",
 	"Cargo.toml",
