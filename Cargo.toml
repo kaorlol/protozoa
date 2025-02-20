@@ -11,7 +11,7 @@ include = [
 ]
 
 [dependencies]
-protozoa-cryptography = "0.1.0"
+protozoa-cryptography = "0.1.1"
 anyhow = "1.0.96"
 futures = "0.3.31"
 lazy_static = "1.5.0"
