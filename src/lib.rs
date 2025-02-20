@@ -14,6 +14,16 @@ pub enum Provider {
 	AnimePahe,
 }
 
+impl fmt::Display for Provider {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		match self {
+			Provider::HiAnime => write!(f, "HiAnime"),
+			Provider::AnimeKai => write!(f, "AnimeKai"),
+			Provider::AnimePahe => write!(f, "AnimePahe"),
+		}
+	}
+}
+
 pub async fn search(provider: Provider, query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
 	match provider {
 		Provider::HiAnime => hianime::ajax::search(query).await,
@@ -27,6 +37,12 @@ pub struct SearchResult {
 	pub title: String,
 	pub poster: String,
 	pub id: String,
+}
+
+impl fmt::Display for SearchResult {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "{}", self.title)
+	}
 }
 
 impl SearchResult {
@@ -96,6 +112,12 @@ pub struct Episode {
 	pub id: String,
 }
 
+impl fmt::Display for Episode {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "{}", self.title)
+	}
+}
+
 impl Episode {
 	pub async fn servers(&self, provider: Provider) -> Result<Vec<Server>, anyhow::Error> {
 		match provider {
@@ -111,6 +133,12 @@ pub struct Server {
 	pub name: String,
 	pub locale: Locale,
 	pub url: String,
+}
+
+impl fmt::Display for Server {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "{}", self.name)
+	}
 }
 
 impl Server {
