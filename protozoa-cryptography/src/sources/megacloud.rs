@@ -70,7 +70,7 @@ async fn rabbit(xrax: &str) -> Result<Rabbit, anyhow::Error> {
 	let wasm = get_wasm().await?;
 
 	let script = reqwest::get(
-		"https://raw.githubusercontent.com/kaorlol/protozoa/refs/heads/main/cryptography/rabbit.js",
+		"https://github.com/kaorlol/protozoa/blob/main/protozoa-cryptography/rabbit.js",
 	)
 	.await?
 	.bytes()
