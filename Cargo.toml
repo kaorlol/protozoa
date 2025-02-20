@@ -1,6 +1,6 @@
 [package]
 name = "protozoa"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 repository = "https://github.com/kaorlol/protozoa"
 description = "A scraper for various anime websites"
@@ -11,7 +11,7 @@ include = [
 ]
 
 [dependencies]
-protozoa-cryptography = "0.1.1"
+protozoa-cryptography = "0.1.2"
 anyhow = "1.0.96"
 futures = "0.3.31"
 lazy_static = "1.5.0"
