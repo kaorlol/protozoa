@@ -3,13 +3,15 @@ name = "protozoa"
 version = "0.1.0"
 edition = "2021"
 repository = "https://github.com/kaorlol/protozoa"
+description = "A scraper for various anime websites"
+license = "MIT"
 include = [
 	"**/*.rs",
 	"Cargo.toml",
 ]
 
 [dependencies]
-protozoa-cryptography ={ path = "./protozoa-cryptography" }
+protozoa-cryptography = "0.1.0"
 anyhow = "1.0.96"
 futures = "0.3.31"
 lazy_static = "1.5.0"

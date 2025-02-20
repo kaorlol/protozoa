@@ -2401,6 +2401,8 @@ dependencies = [
 [[package]]
 name = "protozoa-cryptography"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a5fec6074289638875f1162b6a0d4bae103230a033b335f431cab7fbb50af25"
 dependencies = [
  "aes",
  "anyhow",
