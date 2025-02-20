@@ -1,6 +1,7 @@
 use crate::{Caption, Episode, Locale, SearchResult, Server, Source};
 use anyhow::Context as _;
 use kuchikiki::traits::*;
+use protozoa_cryptography::sources::{animekai, megaup};
 use serde_json::Value;
 
 pub async fn search(query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
@@ -54,7 +55,7 @@ pub async fn episodes(id: &str) -> Result<Vec<Episode>, anyhow::Error> {
 		let attributes = bookmark.attributes.borrow();
 		attributes.get("data-id").unwrap().to_string()
 	};
-	let enc_id = cryptography::sources::animekai::encrypt(&bookmark_id);
+	let enc_id = animekai::encrypt(&bookmark_id);
 
 	let json: Value = reqwest::get(format!(
 		"https://animekai.to/ajax/episodes/list?ani_id={bookmark_id}&_={enc_id}"
@@ -90,7 +91,7 @@ pub async fn episodes(id: &str) -> Result<Vec<Episode>, anyhow::Error> {
 }
 
 pub async fn servers(token: &str) -> Result<Vec<Server>, anyhow::Error> {
-	let enc_token = cryptography::sources::animekai::encrypt(token);
+	let enc_token = animekai::encrypt(token);
 
 	let json: Value = reqwest::get(format!(
 		"https://animekai.to/ajax/links/list?token={token}&_={enc_token}"
@@ -116,7 +117,7 @@ pub async fn servers(token: &str) -> Result<Vec<Server>, anyhow::Error> {
 		};
 
 		let lid = attributes.get("data-lid").unwrap();
-		let enc_lid = cryptography::sources::animekai::encrypt(lid);
+		let enc_lid = animekai::encrypt(lid);
 
 		let json: Value = reqwest::get(format!(
 			"https://animekai.to/ajax/links/view?id={lid}&_={enc_lid}"
@@ -126,7 +127,7 @@ pub async fn servers(token: &str) -> Result<Vec<Server>, anyhow::Error> {
 		.await?;
 
 		let result = json["result"].as_str().context("No result")?;
-		let json: Value = serde_json::from_str(&cryptography::sources::animekai::decrypt(result))?;
+		let json: Value = serde_json::from_str(&animekai::decrypt(result))?;
 		let url = json["url"].as_str().context("No url")?.to_string();
 
 		let name = format!("{name} · {locale}");
@@ -144,7 +145,7 @@ pub async fn get_source(url: &str) -> Result<Source, anyhow::Error> {
 		.await?;
 
 	let result = json["result"].as_str().context("No result")?;
-	let decrypted = cryptography::sources::megaup::decrypt(result);
+	let decrypted = megaup::decrypt(result);
 	let json: Value = serde_json::from_str(&decrypted)?;
 
 	let url = json["sources"][0]["file"].as_str().context("No file")?;

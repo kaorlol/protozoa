@@ -1,6 +1,7 @@
-use crate::{Episode, Locale, SearchResult, Server, Source, Caption};
+use crate::{Caption, Episode, Locale, SearchResult, Server, Source};
 use anyhow::Context as _;
 use kuchikiki::traits::*;
+use protozoa_cryptography::sources::megacloud;
 use serde_json::Value;
 
 pub async fn search(query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
@@ -109,13 +110,14 @@ pub async fn servers(ep_id: &str) -> Result<Vec<Server>, anyhow::Error> {
 
 pub async fn get_source(url: &str) -> Result<Source, anyhow::Error> {
 	let xrax = url.rsplit_once('/').unwrap().1.split('?').next().unwrap();
-	let (json, secret) = cryptography::sources::megacloud::get_sources(xrax.to_string()).await?;
+	let (json, secret) = megacloud::get_sources(xrax.to_string()).await?;
 
 	let json: Value = serde_json::from_str(&json).context("Failed to parse sources")?;
 	let cipher_text = json["sources"].as_str().unwrap();
-	let decrypted = cryptography::sources::megacloud::decrypt(cipher_text, &secret)?;
+	let decrypted = megacloud::decrypt(cipher_text, &secret)?;
 
-	let sources: Vec<Value> = serde_json::from_str(&decrypted).context("Failed to parse decrypted")?;
+	let sources: Vec<Value> =
+		serde_json::from_str(&decrypted).context("Failed to parse decrypted")?;
 	let url = sources[0]["file"].as_str().unwrap().to_string();
 	let mut captions: Vec<Caption> = serde_json::from_value(json["tracks"].clone())?;
 	captions.retain(|track| track.kind != "thumbnails");
