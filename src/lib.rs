@@ -1,6 +1,8 @@
 mod animekai;
 mod animepahe;
+mod aniskip;
 mod hianime;
+mod mal;
 
 use serde::{
 	de::{self, MapAccess, Visitor},
@@ -26,9 +28,9 @@ impl fmt::Display for Provider {
 
 pub async fn search(provider: &Provider, query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
 	match provider {
-		Provider::HiAnime => hianime::ajax::search(query).await,
-		Provider::AnimeKai => animekai::ajax::search(query).await,
-		Provider::AnimePahe => animepahe::api::search(query).await,
+		Provider::HiAnime => hianime::search(query).await,
+		Provider::AnimeKai => animekai::search(query).await,
+		Provider::AnimePahe => animepahe::search(query).await,
 	}
 }
 
@@ -48,9 +50,9 @@ impl fmt::Display for SearchResult {
 impl SearchResult {
 	pub async fn episodes(&self, provider: &Provider) -> Result<Vec<Episode>, anyhow::Error> {
 		match provider {
-			Provider::HiAnime => hianime::ajax::episodes(&self.id).await,
-			Provider::AnimeKai => animekai::ajax::episodes(&self.id).await,
-			Provider::AnimePahe => animepahe::api::episodes(&self.id).await,
+			Provider::HiAnime => hianime::episodes(&self.id).await,
+			Provider::AnimeKai => animekai::episodes(&self.id).await,
+			Provider::AnimePahe => animepahe::episodes(&self.id).await,
 		}
 	}
 }
@@ -121,9 +123,9 @@ impl fmt::Display for Episode {
 impl Episode {
 	pub async fn servers(&self, provider: &Provider) -> Result<Vec<Server>, anyhow::Error> {
 		match provider {
-			Provider::HiAnime => hianime::ajax::servers(&self.id).await,
-			Provider::AnimeKai => animekai::ajax::servers(&self.id).await,
-			Provider::AnimePahe => animepahe::api::servers(&self.id).await,
+			Provider::HiAnime => hianime::servers(&self.id).await,
+			Provider::AnimeKai => animekai::servers(&self.id).await,
+			Provider::AnimePahe => animepahe::servers(&self.id).await,
 		}
 	}
 }
@@ -144,9 +146,9 @@ impl fmt::Display for Server {
 impl Server {
 	pub async fn get_source(&self, provider: &Provider) -> Result<Source, anyhow::Error> {
 		match provider {
-			Provider::HiAnime => hianime::ajax::get_source(&self.url).await,
-			Provider::AnimeKai => animekai::ajax::get_source(&self.url).await,
-			Provider::AnimePahe => animepahe::api::get_source(&self.url).await,
+			Provider::HiAnime => hianime::get_source(&self.url).await,
+			Provider::AnimeKai => animekai::get_source(&self.url).await,
+			Provider::AnimePahe => animepahe::get_source(&self.url).await,
 		}
 	}
 }
