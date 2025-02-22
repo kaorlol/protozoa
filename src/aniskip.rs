@@ -18,7 +18,7 @@ pub enum SkipType {
 }
 
 pub async fn get_skip_times(
-	title: &str, ep_number: u16, ep_length: u32,
+	title: &str, ep_number: u32, ep_length: f32,
 ) -> Result<Vec<SkipTimes>, anyhow::Error> {
 	let mal_id = mal::search(title).await?.id;
 	let client = ClientBuilder::new().use_rustls_tls().build()?;
@@ -65,7 +65,7 @@ pub async fn get_skip_times(
 
 #[tokio::test]
 async fn test_get_skip_times() {
-	let skip_times = get_skip_times("One Piece", 1, 1500).await.unwrap();
+	let skip_times = get_skip_times("One Piece", 1, 1500.).await.unwrap();
 	assert_eq!(
 		skip_times,
 		vec![

@@ -1,6 +1,6 @@
 [package]
 name = "protozoa"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 repository = "https://github.com/kaorlol/protozoa"
 description = "A scraper for various anime websites"
