@@ -1,6 +1,6 @@
 mod animekai;
 mod animepahe;
-mod aniskip;
+pub mod aniskip;
 mod hianime;
 mod mal;
 
