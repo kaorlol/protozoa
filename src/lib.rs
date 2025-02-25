@@ -17,13 +17,13 @@ pub enum Provider {
 	AnimePahe,
 }
 
-impl From<&str> for Provider {
-	fn from(s: &str) -> Self {
+impl Provider {
+	pub fn from(s: &str) -> Option<Self> {
 		match s.to_lowercase().as_str() {
-			"hianime" => Provider::HiAnime,
-			"animekai" => Provider::AnimeKai,
-			"animepahe" => Provider::AnimePahe,
-			_ => panic!("Invalid provider"),
+			"hianime" => Some(Provider::HiAnime),
+			"animekai" => Some(Provider::AnimeKai),
+			"animepahe" => Some(Provider::AnimePahe),
+			_ => None,
 		}
 	}
 }
