@@ -6,14 +6,26 @@ mod mal;
 
 use serde::{
 	de::{self, MapAccess, Visitor},
-	Deserialize, Deserializer,
+	Deserialize, Deserializer, Serialize,
 };
 use std::fmt;
 
+#[derive(Debug, PartialEq, Serialize)]
 pub enum Provider {
 	HiAnime,
 	AnimeKai,
 	AnimePahe,
+}
+
+impl From<&str> for Provider {
+	fn from(s: &str) -> Self {
+		match s.to_lowercase().as_str() {
+			"hianime" => Provider::HiAnime,
+			"animekai" => Provider::AnimeKai,
+			"animepahe" => Provider::AnimePahe,
+			_ => panic!("Invalid provider"),
+		}
+	}
 }
 
 impl fmt::Display for Provider {
@@ -34,7 +46,7 @@ pub async fn search(provider: &Provider, query: &str) -> Result<Vec<SearchResult
 	}
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct SearchResult {
 	pub title: String,
 	pub poster: String,
@@ -105,7 +117,7 @@ impl<'de> Deserialize<'de> for SearchResult {
 	}
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Episode {
 	pub title: String,
 	#[serde(alias = "episode")]
@@ -130,7 +142,7 @@ impl Episode {
 	}
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize)]
 pub struct Server {
 	pub name: String,
 	pub locale: Locale,
@@ -153,7 +165,7 @@ impl Server {
 	}
 }
 
-#[derive(Debug, Default, PartialEq)]
+#[derive(Debug, Default, PartialEq, Serialize)]
 pub enum Locale {
 	#[default]
 	Sub,
@@ -171,13 +183,13 @@ impl fmt::Display for Locale {
 	}
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize)]
 pub struct Source {
 	pub url: String,
 	pub captions: Vec<Caption>,
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Serialize)]
 pub struct Caption {
 	#[serde(rename = "file")]
 	pub url: String,
