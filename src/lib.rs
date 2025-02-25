@@ -59,13 +59,11 @@ impl fmt::Display for SearchResult {
 	}
 }
 
-impl SearchResult {
-	pub async fn episodes(&self, provider: &Provider) -> Result<Vec<Episode>, anyhow::Error> {
-		match provider {
-			Provider::HiAnime => hianime::episodes(&self.id).await,
-			Provider::AnimeKai => animekai::episodes(&self.id).await,
-			Provider::AnimePahe => animepahe::episodes(&self.id).await,
-		}
+pub async fn episodes(id: &str, provider: &Provider) -> Result<Vec<Episode>, anyhow::Error> {
+	match provider {
+		Provider::HiAnime => hianime::episodes(id).await,
+		Provider::AnimeKai => animekai::episodes(id).await,
+		Provider::AnimePahe => animepahe::episodes(id).await,
 	}
 }
 
@@ -132,13 +130,11 @@ impl fmt::Display for Episode {
 	}
 }
 
-impl Episode {
-	pub async fn servers(&self, provider: &Provider) -> Result<Vec<Server>, anyhow::Error> {
-		match provider {
-			Provider::HiAnime => hianime::servers(&self.id).await,
-			Provider::AnimeKai => animekai::servers(&self.id).await,
-			Provider::AnimePahe => animepahe::servers(&self.id).await,
-		}
+pub async fn servers(ep_id: &str, provider: &Provider) -> Result<Vec<Server>, anyhow::Error> {
+	match provider {
+		Provider::HiAnime => hianime::servers(ep_id).await,
+		Provider::AnimeKai => animekai::servers(ep_id).await,
+		Provider::AnimePahe => animepahe::servers(ep_id).await,
 	}
 }
 
@@ -155,13 +151,11 @@ impl fmt::Display for Server {
 	}
 }
 
-impl Server {
-	pub async fn get_source(&self, provider: &Provider) -> Result<Source, anyhow::Error> {
-		match provider {
-			Provider::HiAnime => hianime::get_source(&self.url).await,
-			Provider::AnimeKai => animekai::get_source(&self.url).await,
-			Provider::AnimePahe => animepahe::get_source(&self.url).await,
-		}
+pub async fn get_source(url: &str, provider: &Provider) -> Result<Source, anyhow::Error> {
+	match provider {
+		Provider::HiAnime => hianime::get_source(url).await,
+		Provider::AnimeKai => animekai::get_source(url).await,
+		Provider::AnimePahe => animepahe::get_source(url).await,
 	}
 }
 
