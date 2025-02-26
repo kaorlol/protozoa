@@ -7,8 +7,6 @@ use kuchikiki::traits::*;
 use regex::Regex;
 use reqwest::{header, Client};
 use serde_json::Value;
-// use std::sync::LazyLock;
-// use tokio::sync::OnceCell;
 
 async fn create_client() -> Result<Client, anyhow::Error> {
 	let res = reqwest::get("https://check.ddos-guard.net/check.js").await?;
@@ -41,14 +39,6 @@ async fn create_client() -> Result<Client, anyhow::Error> {
 	Ok(client)
 }
 
-// static CLIENT: LazyLock<OnceCell<Client>> = LazyLock::new(OnceCell::new);
-
-// async fn create_client() -> Result<&'static Client, anyhow::Error> {
-// 	Ok(CLIENT
-// 		.get_or_init(|| async { create_client().await.unwrap() })
-// 		.await)
-// }
-
 pub async fn search(query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
 	let client = create_client().await?;
 	let json: Value = client
@@ -74,7 +64,7 @@ pub async fn episodes(id: &str) -> Result<Vec<Episode>, anyhow::Error> {
 	let document = kuchikiki::parse_html().one(html).document_node;
 	let script = document
 		.select("script")
-		.expect("script not found")
+		.map_err(|_| anyhow::anyhow!("script not found"))?
 		.find(|x| x.text_contents().contains("let id ="))
 		.context("Failed to get anime data")?
 		.text_contents();
@@ -167,7 +157,9 @@ pub async fn servers(ep_id: &str) -> Result<Vec<Server>, anyhow::Error> {
 		.await?;
 
 	let document = kuchikiki::parse_html().one(html).document_node;
-	let servers = document.select("#resolutionMenu button").unwrap();
+	let servers = document
+		.select("#resolutionMenu button")
+		.map_err(|_| anyhow::anyhow!("No servers"))?;
 	let server_list: Vec<Server> = servers
 		.rev()
 		.map(|server| {
@@ -195,7 +187,7 @@ pub async fn get_source(url: &str) -> Result<Source, anyhow::Error> {
 	let document = kuchikiki::parse_html().one(html).document_node;
 	let script = document
 		.select("script")
-		.expect("script not found")
+		.map_err(|_| anyhow::anyhow!("script not found"))?
 		.find(|x| x.text_contents().contains("function(p,a,c,k,e,d)"))
 		.context("Failed to get video data")?
 		.text_contents();

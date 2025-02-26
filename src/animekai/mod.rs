@@ -15,7 +15,9 @@ pub async fn search(query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
 	let html = json["result"]["html"].as_str().context("No result")?;
 	let document = kuchikiki::parse_html().one(html).document_node;
 
-	let items = document.select(".aitem").expect("Failed to select items");
+	let items = document
+		.select(".aitem")
+		.map_err(|_| anyhow::anyhow!("No items"))?;
 
 	let results: Vec<SearchResult> = items
 		.map(|item| {
@@ -50,11 +52,15 @@ pub async fn episodes(id: &str) -> Result<Vec<Episode>, anyhow::Error> {
 		.await?;
 
 	let document = kuchikiki::parse_html().one(html).document_node;
-	let bookmark = document.select_first(".user-bookmark").unwrap();
+	let bookmark = document
+		.select_first(".user-bookmark")
+		.map_err(|_| anyhow::anyhow!("No bookmark"))?;
+
 	let bookmark_id = {
 		let attributes = bookmark.attributes.borrow();
 		attributes.get("data-id").unwrap().to_string()
 	};
+
 	let enc_id = animekai::encrypt(&bookmark_id);
 
 	let json: Value = reqwest::get(format!(
@@ -66,26 +72,29 @@ pub async fn episodes(id: &str) -> Result<Vec<Episode>, anyhow::Error> {
 
 	let html = json["result"].as_str().context("No result")?;
 	let document = kuchikiki::parse_html().one(html).document_node;
-	let episodes = document.select("a").unwrap();
+	let episodes = document
+		.select("a")
+		.map_err(|_| anyhow::anyhow!("No episodes"))?;
 
-	let episode_list: Vec<Episode> = episodes
+	let episode_list = episodes
 		.map(|episode| {
 			let attributes = episode.attributes.borrow();
-			let id = attributes.get("token").unwrap();
+			let id = attributes.get("token").context("No token")?;
 			let title = episode
 				.as_node()
 				.select_first("span")
-				.unwrap()
+				.map_err(|_| anyhow::anyhow!("No title"))?
 				.text_contents();
+
 			let number = attributes.get("num").unwrap().parse().unwrap();
 
-			Episode {
+			Ok(Episode {
 				id: id.to_string(),
 				title,
 				number,
-			}
+			})
 		})
-		.collect();
+		.collect::<Result<Vec<Episode>, anyhow::Error>>()?;
 
 	Ok(episode_list)
 }
@@ -103,7 +112,9 @@ pub async fn servers(token: &str) -> Result<Vec<Server>, anyhow::Error> {
 	let html = json["result"].as_str().context("No result")?;
 
 	let document = kuchikiki::parse_html().one(html).document_node;
-	let servers = document.select(".server").unwrap();
+	let servers = document
+		.select(".server")
+		.map_err(|_| anyhow::anyhow!("No servers"))?;
 
 	let mut server_list = Vec::new();
 	for server in servers {

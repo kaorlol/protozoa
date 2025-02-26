@@ -13,7 +13,7 @@ pub async fn search(query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
 	let document = kuchikiki::parse_html().one(html).document_node;
 	let items = document
 		.select(".flw-item")
-		.expect("Failed to select items");
+		.map_err(|_| anyhow::anyhow!("Failed to select items"))?;
 
 	let results: Vec<SearchResult> = items
 		.map(|item| {
@@ -48,7 +48,7 @@ pub async fn episodes(id: &str) -> Result<Vec<Episode>, anyhow::Error> {
 	let document = kuchikiki::parse_html().one(html).document_node;
 	let episodes = document
 		.select(".ep-item")
-		.expect("Failed to select episodes");
+		.map_err(|_| anyhow::anyhow!("Failed to select episodes"))?;
 
 	let episode_list: Vec<Episode> = episodes
 		.map(|episode| {
@@ -77,7 +77,7 @@ pub async fn servers(ep_id: &str) -> Result<Vec<Server>, anyhow::Error> {
 	let document = kuchikiki::parse_html().one(html).document_node;
 	let servers = document
 		.select(".server-item")
-		.expect("Failed to select servers");
+		.map_err(|_| anyhow::anyhow!("Failed to select servers"))?;
 
 	let mut server_list = Vec::new();
 
