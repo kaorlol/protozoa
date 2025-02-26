@@ -59,7 +59,7 @@ impl fmt::Display for SearchResult {
 	}
 }
 
-pub async fn episodes(id: &str, provider: &Provider) -> Result<Vec<Episode>, anyhow::Error> {
+pub async fn episodes(provider: &Provider, id: &str) -> Result<Vec<Episode>, anyhow::Error> {
 	match provider {
 		Provider::HiAnime => hianime::episodes(id).await,
 		Provider::AnimeKai => animekai::episodes(id).await,
@@ -115,13 +115,56 @@ impl<'de> Deserialize<'de> for SearchResult {
 	}
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize)]
 pub struct Episode {
 	pub title: String,
-	#[serde(alias = "episode")]
 	pub number: u32,
-	#[serde(rename = "session")]
 	pub id: String,
+}
+
+impl<'de> Deserialize<'de> for Episode {
+	fn deserialize<D>(deserializer: D) -> Result<Episode, D::Error>
+	where
+		D: Deserializer<'de>,
+	{
+		struct EpisodeVisitor;
+
+		impl<'de> Visitor<'de> for EpisodeVisitor {
+			type Value = Episode;
+
+			fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+				formatter.write_str("a map with title, number, and id fields")
+			}
+
+			fn visit_map<M>(self, mut map: M) -> Result<Episode, M::Error>
+			where
+				M: MapAccess<'de>,
+			{
+				let mut title = None;
+				let mut number = None;
+				let mut id = None;
+
+				while let Some(key) = map.next_key::<String>()? {
+					match key.as_str() {
+						"title" => title = Some(map.next_value()?),
+						"episode" => number = Some(map.next_value()?),
+						"session" => id = Some(map.next_value()?),
+						_ => {
+							map.next_value::<serde::de::IgnoredAny>()?;
+						}
+					}
+				}
+
+				let title = title.ok_or_else(|| de::Error::missing_field("title"))?;
+				let number = number.ok_or_else(|| de::Error::missing_field("number"))?;
+				let id = id.ok_or_else(|| de::Error::missing_field("id"))?;
+
+				Ok(Episode { title, number, id })
+			}
+		}
+
+		deserializer.deserialize_map(EpisodeVisitor)
+	}
 }
 
 impl fmt::Display for Episode {
@@ -130,7 +173,7 @@ impl fmt::Display for Episode {
 	}
 }
 
-pub async fn servers(ep_id: &str, provider: &Provider) -> Result<Vec<Server>, anyhow::Error> {
+pub async fn servers(provider: &Provider, ep_id: &str) -> Result<Vec<Server>, anyhow::Error> {
 	match provider {
 		Provider::HiAnime => hianime::servers(ep_id).await,
 		Provider::AnimeKai => animekai::servers(ep_id).await,
@@ -151,7 +194,7 @@ impl fmt::Display for Server {
 	}
 }
 
-pub async fn get_source(url: &str, provider: &Provider) -> Result<Source, anyhow::Error> {
+pub async fn get_source(provider: &Provider, url: &str) -> Result<Source, anyhow::Error> {
 	match provider {
 		Provider::HiAnime => hianime::get_source(url).await,
 		Provider::AnimeKai => animekai::get_source(url).await,
