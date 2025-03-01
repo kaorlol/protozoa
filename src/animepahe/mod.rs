@@ -61,7 +61,7 @@ pub async fn episodes(id: &str) -> Result<Vec<Episode>, anyhow::Error> {
 		.text()
 		.await?;
 
-	let document = kuchikiki::parse_html().one(html).document_node;
+	let document = kuchikiki::parse_html().one(html);
 	let script = document
 		.select("script")
 		.map_err(|_| anyhow::anyhow!("script not found"))?
@@ -156,7 +156,7 @@ pub async fn servers(ep_id: &str) -> Result<Vec<Server>, anyhow::Error> {
 		.text()
 		.await?;
 
-	let document = kuchikiki::parse_html().one(html).document_node;
+	let document = kuchikiki::parse_html().one(html);
 	let servers = document
 		.select("#resolutionMenu button")
 		.map_err(|_| anyhow::anyhow!("No servers"))?;
@@ -184,7 +184,7 @@ pub async fn servers(ep_id: &str) -> Result<Vec<Server>, anyhow::Error> {
 pub async fn get_source(url: &str) -> Result<Source, anyhow::Error> {
 	let client = create_client().await?;
 	let html = client.get(url).send().await?.text().await?;
-	let document = kuchikiki::parse_html().one(html).document_node;
+	let document = kuchikiki::parse_html().one(html);
 	let script = document
 		.select("script")
 		.map_err(|_| anyhow::anyhow!("script not found"))?

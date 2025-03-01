@@ -13,7 +13,7 @@ pub async fn search(query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
 	.await?;
 
 	let html = json["result"]["html"].as_str().context("No result")?;
-	let document = kuchikiki::parse_html().one(html).document_node;
+	let document = kuchikiki::parse_html().one(html);
 
 	let items = document
 		.select(".aitem")
@@ -51,7 +51,7 @@ pub async fn episodes(id: &str) -> Result<Vec<Episode>, anyhow::Error> {
 		.text()
 		.await?;
 
-	let document = kuchikiki::parse_html().one(html).document_node;
+	let document = kuchikiki::parse_html().one(html);
 	let bookmark = document
 		.select_first(".user-bookmark")
 		.map_err(|_| anyhow::anyhow!("No bookmark"))?;
@@ -71,7 +71,7 @@ pub async fn episodes(id: &str) -> Result<Vec<Episode>, anyhow::Error> {
 	.await?;
 
 	let html = json["result"].as_str().context("No result")?;
-	let document = kuchikiki::parse_html().one(html).document_node;
+	let document = kuchikiki::parse_html().one(html);
 	let episodes = document
 		.select("a")
 		.map_err(|_| anyhow::anyhow!("No episodes"))?;
@@ -111,7 +111,7 @@ pub async fn servers(token: &str) -> Result<Vec<Server>, anyhow::Error> {
 
 	let html = json["result"].as_str().context("No result")?;
 
-	let document = kuchikiki::parse_html().one(html).document_node;
+	let document = kuchikiki::parse_html().one(html);
 	let servers = document
 		.select(".server")
 		.map_err(|_| anyhow::anyhow!("No servers"))?;

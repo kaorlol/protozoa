@@ -10,7 +10,7 @@ pub async fn search(query: &str) -> Result<Vec<SearchResult>, anyhow::Error> {
 		.text()
 		.await?;
 
-	let document = kuchikiki::parse_html().one(html).document_node;
+	let document = kuchikiki::parse_html().one(html);
 	let items = document
 		.select(".flw-item")
 		.map_err(|_| anyhow::anyhow!("Failed to select items"))?;
@@ -45,7 +45,7 @@ pub async fn episodes(id: &str) -> Result<Vec<Episode>, anyhow::Error> {
 		.await?;
 
 	let html = json["html"].as_str().unwrap();
-	let document = kuchikiki::parse_html().one(html).document_node;
+	let document = kuchikiki::parse_html().one(html);
 	let episodes = document
 		.select(".ep-item")
 		.map_err(|_| anyhow::anyhow!("Failed to select episodes"))?;
@@ -74,7 +74,7 @@ pub async fn servers(ep_id: &str) -> Result<Vec<Server>, anyhow::Error> {
 	.await?;
 
 	let html = json["html"].as_str().unwrap();
-	let document = kuchikiki::parse_html().one(html).document_node;
+	let document = kuchikiki::parse_html().one(html);
 	let servers = document
 		.select(".server-item")
 		.map_err(|_| anyhow::anyhow!("Failed to select servers"))?;
