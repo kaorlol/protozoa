@@ -1,18 +1,33 @@
 use crate::ciphers::rc4::{decode_url_safe_base64, rc4, replace, reverse};
 
 pub fn decrypt(input: &str) -> String {
-	let mut new_input = decode_url_safe_base64(input);
-	new_input = decode_url_safe_base64(&new_input);
-	new_input = rc4("E438hS1W9oRmB", &new_input);
-	new_input = reverse(&new_input);
-	new_input = replace(&new_input, "D5qdzkGANMQZEi", "Q5diEGMADkZzNq");
-	new_input = reverse(&new_input);
-	new_input = decode_url_safe_base64(&new_input);
-	new_input = rc4("NZcfoMD7JpIrgQE", &new_input);
-	new_input = replace(&new_input, "kTr0pjKzBqZV", "kZpjzTV0KqBr");
-	new_input = decode_url_safe_base64(&new_input);
-	new_input = rc4("Gay7bxj5B81TJFM", &new_input);
-	new_input = replace(&new_input, "zcUxoJTi3fgyS", "oSgyJUfizcTx3");
-	new_input = reverse(&new_input);
-	urlencoding::decode(&new_input).unwrap().into_owned()
+	let text = &replace(
+		&rc4(
+			"fnxEj3tD4Bl0X",
+			&decode_url_safe_base64(&reverse(&reverse(&rc4(
+				"IjilzMV57GrnF",
+				&decode_url_safe_base64(&replace(
+					&reverse(&replace(
+						&rc4(
+							"PlzI69YVCtGwoa8",
+							&decode_url_safe_base64(&decode_url_safe_base64(input)),
+						),
+						"c2IfHZwSX1mj",
+						"mwfXcS2ZjI1H",
+					)),
+					"82NkgQDYbIF",
+					"82IQNkFgYbD",
+				)),
+			)))),
+		),
+		"crwkth05iJR8",
+		"JRkt8rw0i5ch",
+	);
+	urlencoding::decode(text).unwrap().into_owned()
+}
+
+#[test]
+fn test_decrypt() {
+	let decrypted = decrypt("ZGU2Y21ObkcxcUhRbi1aWmhPbWh6azZxTV96TndndVBnV1k1QmhKR1FMSTFVNzJSMGlCRVVyU3dyQmJfZEJrZl9vTlpiRmRzWnhSVU9fRC1RaWtQTVpWU1U5Sk9tR2pSZ0k1dDlzNzJkV3NDRVlhS19RVlEwSmdDMVZkaTlGWXdvMHpzUE5yb3FtbHNoRC1JYUJreWkwdzVuSkNoZnlON2FIR2JiS19PejAzQ1h5MVpfZ3p3cVM3MjJpMGNtSVFUUTUtdUx5Q25pNXEzVDJaVTZSdnFkWXFuQ21fVE9saEc2MWlFeTVRM3pZS1JvcEswZEdya0czREs1ZjltZW9UMmxoNXJoSC0xQ0VjNUJuOE5fbDNmRDBBUThTZjRRcW93UHFvVFBXNl9GMnpHTzVxZ1BOVG5LdGVNbmhBTDh3Qm84aW5Yc1ZjM2JVZm9mQkNHVjBpZkhBcVc3NURyaVhIeGlmWk1VbmdnYi0wTUlHcVhQaExpMU9fTkVyMzFhYnRnQ3ZEQS1sVjRaVW1LenJoUWdDMFZzVVVYeVdNM2hQbkcxeHRFVmtEQTJZam5jOHMxaVg2cFN3TjZsb3JOajFQUWc0c2FGZUxsbDhwZi1QS2hfd3dTVTlkem5WZHhTVDU4ckw5RnREMzVIbHNHUzh2S1NhcVFaZUZiaktFdHIxaWtObnBwdzJ2OFI2ZG5sTW11OWNpakZ2SVRxMnFVZHpSQll2QmxWT1E4eUJJZjQ5U3g5blhfSUFMYkdkcTRPRHhfUVJaVGowQW95Mk9FYkdlRnlYd1FLUndfQ1FZTktxVWNZYjl0OVVjTU11VmI2QkJDWFAxMm10aWJmMlJUbU1aeGl1UkE0MG1yMnpqcE1lSVp2Z0hOdFlLM3V1QlRhOGZmWEk2cWNicURMRGY2OGgyOXFKWTAtRUVwdlFSQW11RnR0Wm02RUJRSXVVQTQ1azdNRkdYdk51SGVBWE5iMFlKY3dCZEJqR21sd0Z1YmVmR1U3QVFxaTB2NGVNSlVvWjBlZW5OVkJBVlhLM2JQYWx5TERBQUVaOTdGcHQxTmJPV1ZTQl9CYVhtMzhRektVWWNvcjI3TDhhbU1YZDJQaTZaNE9MQ0Q1enVzbFdsRy1fLTJyLWFaNktLeWRfRUN0TjJFcC1PckdiUUhvc0E2d3BPSWQtRXRQWjJWeF9GaE9sd0xjc2UtcTgwM3dfdGRUMWRTMFhVMFRCa29RaVdxV0VWRnV3aGx3QnhvUGdMNE40Q3p5M3FncGNvazl1azg3UHVXVHNwN0o2VV9yREx0eklBNkZNTWRmREt4RG5Bb3VEWWgzSzFDejR1R0pNQmZoMC1DOUR1dWwzbXpneFA4VzBCaGUyTXJkUklaQWExdC13OXh1dllUVEN4SUtaVW55bVVxVjR1ZjdPV0pJZmE3Z3VRdmFHc3pxa0w1aXVBOGJkYlJfQ05Jb0lKSkhhLXRnZ2FFVTFjYjJBYzZCamQxWlhlU2VtcUNWVWFqbUttOFhfMUJnRnkzejE1YXNySndOcjRpVDFkUUtvU01wYUlFSVJDVEhsMXN1bEZwZHlJazdjT2hfOTlLRWY4dFpGRGFmSFFUTV96NlVPeW0zV2E0S3VkTE9iMGdYbEg4Q29sdzU0bUJXYlBLelZCdGFVWjhaX0tYaUo0NzZmVFlweGtFT2xiY0pNSC13ODVrZERGMFg5ckJ4RmZsSG82V09DU2RVd0FSV3YzTURZN1RNQXZFa3Nxa2JEeHQ5M0tOeGZpS2g5QWk3S2xrN0lpRTAzYm5jSEFiTjVqLTFjYW91a2FkNmdyZnU0VXBvQ2tPU1JxMDFUZVNpbmgzOXVrbFNodlFTUXNtR09FTEE3blRVS1Z2RzlsRGZEdEcxdGkyT3FqT0NDdVZIZk82dVFHRFg1OC1fZ2p0ZVQzdEN4QjY0LVVBWnJWdzVxalRkMzVobjdxRXNRU2NjMlNkN2RtVl9oZWM5ZGFQZzhDRUI5RklkVDNVNGlGRnVwVm1PSUtHaV9sRlBGTS1fdmVOR01TbU12UFc5eUZtN0JzNFRkcm0xaUN0dzYtaTVPZzkxM2V5Rk44NnBya1JBbjRaTWhMM3JiUTBiTDdLbzhJdEticGwzSVhqVHZ4UlVuRDFPdDVZLXBBS2hRZ3NFZm9YbENGUjFGRnp5SjN1V1BvLXJtZFY2S1pkN25ZVnNfci1mbE5BM2NJUlFteXI0MVBZMWxvcWZweXFSYkdRSl91dGxJWFdldWtvVFBHV1AtNDA1YmRmXzdSQ21mQmF1SXA5cWpYMWtkcjloc001ZmFUbkxpT1QzWUV4dElobk9Xa1ZYa3N1anl3a0JVNkRla2lHbXlDTjFuTGFfaVA0LXFmejhWVU16aVJEVVpYOVU1dVlEM0pqUDhEdTgwbVg5UzZoZkFRUl91ZDJTODlhdnFZZFFTWThneEZNN1E2eHprT1lpTmphWGs1OW5hUWZYSU96TU5WZ1dTVG1VUVVzdTFpa2x0VlktbGMxOWxWem92Z3NIeG1WYlVON1pDS0J3NUE4MXZRQWJsenlELW9uRlpxWVRrdHlkWVVMMmlBUmh4RUlHQ3ZJdHNVbU1uUm1pRmo2eU9oN2R1N2dhTEdxWE90UDdvMlZ6U1M2WkF1MWZHOWdQbGgwNmV3eGUwQ1lpa2JKdzhEcURETVdvWVN0TkpvUFRZcU9xS2ZoRG5CWjdObXhsWmZzRDI4em9law");
+	println!("{}", decrypted); // {"sources":[{"file":"https:\/\/54d8e.apex-77-adventure.biz\/c3\/hf277c44ee87f02531920bc08770d474cf1e7ffc5b2e564fd981c428032126eda997ad4772672ed4765c47f139599b2b73a73000c87040b4056a4ea6d387ae4a8507f3ed59cd1c016c5b634ea20a3f6f643df13a2386ffe1234eebf4f83f64a81d8fff769ca6885e69bd5efa60b1119\/list,b73e860dba2f0e5a0c21b342720c591da4fce2c0fdfe67.m3u8"}],"tracks":[{"file":"https:\/\/54d8e.megaup.cc\/v3\/hf277c44ee87f02531920bc08770d474cf1e7ffc5b2e564fd981c428032126eda997ad4772672ed4765c47f139599b2b83d710504860a0b4056a4ea6d387ae4af5f7261c383d2d355c5bf3de76afbb4bf088b41fe782bbc1b64fdeb0b82b6029882b7f16cc97dc5f18d\/thumbnails.vtt","kind":"thumbnails"}],"download":"https:\/\/megaup.cc\/download\/2MivLzL-WSyJcOLxE7xN6RfuCg"}
 }
