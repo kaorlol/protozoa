@@ -169,7 +169,7 @@ pub async fn servers(ep_id: &str) -> Result<Vec<Server>, anyhow::Error> {
 			let resolution = attributes.get("data-resolution").unwrap();
 			let locale = match attributes.get("data-audio") {
 				Some("eng") => Locale::Dub,
-				Some("jpn") => Locale::Sub,
+				Some("jpn") => Locale::HardSub,
 				_ => unimplemented!("Unknown locale"),
 			};
 
@@ -239,13 +239,13 @@ mod tests {
 			servers,
 			vec![
 				Server {
-					name: "HorribleSubs · 1080p Sub".to_string(),
-					locale: Locale::Sub,
+					name: "HorribleSubs · 1080p HardSub".to_string(),
+					locale: Locale::HardSub,
 					url: "https://kwik.si/e/InzZMv1U52OE".to_string(),
 				},
 				Server {
-					name: "HorribleSubs · 720p Sub".to_string(),
-					locale: Locale::Sub,
+					name: "HorribleSubs · 720p HardSub".to_string(),
+					locale: Locale::HardSub,
 					url: "https://kwik.si/e/wkp5wNBEkkwE".to_string(),
 				},
 			]

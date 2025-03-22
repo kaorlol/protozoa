@@ -205,7 +205,8 @@ pub async fn get_source(provider: &Provider, url: &str) -> Result<Source, anyhow
 #[derive(Debug, Default, PartialEq, Serialize)]
 pub enum Locale {
 	#[default]
-	Sub,
+	HardSub,
+	SoftSub,
 	Dub,
 	Raw,
 }
@@ -213,7 +214,8 @@ pub enum Locale {
 impl fmt::Display for Locale {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		match self {
-			Locale::Sub => write!(f, "Sub"),
+			Locale::HardSub => write!(f, "HardSub"),
+			Locale::SoftSub => write!(f, "SoftSub"),
 			Locale::Dub => write!(f, "Dub"),
 			Locale::Raw => write!(f, "Raw"),
 		}

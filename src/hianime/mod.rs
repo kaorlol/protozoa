@@ -86,7 +86,7 @@ pub async fn servers(ep_id: &str) -> Result<Vec<Server>, anyhow::Error> {
 		let name = server.text_contents();
 		let server_id = attributes.get("data-id").unwrap();
 		let locale = match attributes.get("data-type") {
-			Some("sub") => Locale::Sub,
+			Some("sub") => Locale::SoftSub,
 			Some("dub") => Locale::Dub,
 			Some("raw") => Locale::Raw,
 			_ => unimplemented!("Unknown locale"),

@@ -2448,7 +2448,7 @@ dependencies = [
 
 [[package]]
 name = "protozoa"
-version = "0.1.13"
+version = "0.1.14"
 dependencies = [
  "anyhow",
  "futures",

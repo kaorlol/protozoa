@@ -122,8 +122,9 @@ pub async fn servers(token: &str) -> Result<Vec<Server>, anyhow::Error> {
 		let name = server.text_contents();
 		let tid = attributes.get("data-tid").unwrap();
 		let locale = match tid.rsplit_once("_").unwrap().1 {
-			"sub" => Locale::Sub,
+			"sub" => Locale::HardSub,
 			"dub" => Locale::Dub,
+			"softsub" => Locale::SoftSub,
 			_ => unimplemented!("Unknown locale"),
 		};
 
@@ -188,14 +189,16 @@ mod tests {
 
 	#[tokio::test]
 	async fn test_servers() {
-		let servers = servers("nRTFnxunDOcjiIGH4J4t").await.unwrap();
+		let servers = servers("ccTwp_Hxokjv02gVx4if").await.unwrap();
 		assert!(!servers.is_empty(), "Servers should not be empty");
 	}
 
 	#[tokio::test]
 	async fn test_get_source() {
-		let servers = servers("nRTFnxunDOcjiIGH4J4t").await.unwrap();
+		let servers = servers("ccTwp_Hxokjv02gVx4if").await.unwrap();
 		assert!(!servers.is_empty(), "Can't test source without servers");
+
+		println!("{:#?}", servers);
 
 		let source = get_source(&servers[0].url).await.unwrap();
 		assert!(!source.url.is_empty(), "Source url should not be empty");
