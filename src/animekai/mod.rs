@@ -118,15 +118,19 @@ pub async fn servers(token: &str) -> Result<Vec<Server>, anyhow::Error> {
 
 	let mut server_list = Vec::new();
 	for server in servers {
-		let attributes = server.attributes.borrow();
-		let name = server.text_contents();
-		let tid = attributes.get("data-tid").unwrap();
-		let locale = match tid.rsplit_once("_").unwrap().1 {
+		let parent = server.as_node().parent().unwrap();
+		let attributes = parent.as_element().unwrap().attributes.borrow();
+
+		let id = attributes.get("data-id").unwrap();
+		let locale = match id {
 			"sub" => Locale::HardSub,
 			"dub" => Locale::Dub,
 			"softsub" => Locale::SoftSub,
 			_ => unimplemented!("Unknown locale"),
 		};
+
+		let attributes = server.attributes.borrow();
+		let name = server.text_contents();
 
 		let lid = attributes.get("data-lid").unwrap();
 		let enc_lid = animekai::encrypt(lid);
